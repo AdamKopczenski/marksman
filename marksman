@@ -1,0 +1,123 @@
+#! /usr/bin/ruby
+require 'pp'
+require 'zlib'
+
+HIDDEN_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+$game_status = {}
+$options = {:interactive => true}
+
+def quote_length
+  return $game_status[:answer].length
+end
+
+def select_quote
+  all_quotes = Zlib::Inflate.inflate(File.read('.data/quotes.dat')).split("\n")
+  return all_quotes.sample
+end
+
+def setup_game
+  $game_status[:answer] = select_quote
+  $game_status[:found_chars] = Array::new(quote_length, false)
+  (0...quote_length).each do |i|
+    $game_status[:found_chars][i] ||= !HIDDEN_CHARACTERS.include?($game_status[:answer][i])
+  end
+end
+
+def screen_width
+  #TODO Consider a more robust solution for other platforms.
+  return `tput cols`.to_i
+end
+
+def wrap_string(s, cols)
+  result = ''
+  remainder = s
+  while remainder.length > cols do
+    index = remainder[0..cols].rindex(' ')
+    result += remainder[0...index] + "\n"
+    remainder = remainder[index + 1..-1]
+  end
+  result += remainder
+  return result
+end
+
+def current_board
+  result = (0...quote_length).map { |i|
+    $game_status[:found_chars][i] ? $game_status[:answer][i] : '_'
+    #TODO consider ‗ for capitals.
+  }.join
+  #TODO line breaks
+
+  return wrap_string(result, screen_width)
+end
+
+def hidden_letters
+  return (0...quote_length).map { |i|
+    $game_status[:found_chars][i] ? '' : $game_status[:answer][i].downcase
+  }.join
+end
+
+def census(letter_set)
+  return letter_set.chars.reduce(Hash::new(0)) do |h, c|
+    h[c] += 1
+    h
+  end
+end
+
+def census_subset?(c1, c2)
+  return c1.keys.all? { |l| c1[l] <= c2[l] }
+end
+
+def hidden_directory
+  return (0...quote_length).reject do |i|
+    $game_status[:found_chars][i]
+  end.group_by do |i|
+    $game_status[:answer][i].downcase
+  end
+end
+
+def reveal(request_census)
+  dir = hidden_directory
+  new_reveals = Array::new(quote_length, false)
+  request_census.each do |letter, count|
+    dir[letter].sample(count).each { |i| $game_status[:found_chars][i] = true }
+  end
+end
+
+def valid_guess?(request_census)
+  return census_subset?(request_census, census(hidden_letters))
+end
+
+def victory?
+  return $game_status[:found_chars].all?
+end
+
+def process_guess(input)
+  in_census = census(input)
+  if valid_guess?(in_census) then
+    if $options[:interactive] then
+      puts "All letters from \"#{input}\" in answer!"
+    end
+    reveal(in_census)
+  else
+    if $options[:interactive] then
+      puts "Not all letters from \"#{input}\" in answer."
+    end
+  end
+  puts current_board
+end
+
+def play_interactive
+  puts current_board
+  guess_counter = 0
+  while !victory?
+    guess_counter += 1
+    print "Guess \##{guess_counter}: "
+    current_guess = gets.chomp
+    process_guess(current_guess)
+  end
+  puts "You won in #{guess_counter} guesses!"
+end
+
+setup_game
+play_interactive
