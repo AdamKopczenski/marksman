@@ -90,7 +90,7 @@ def victory?
 end
 
 def process_guess(input)
-  in_census = Census.new(input)
+  in_census = Census.new(input.gsub(/[^A-Za-z]/, '').downcase)
   if valid_guess?(in_census) then
     if $options[:interactive] then
       puts "All letters from \"#{input}\" in answer!"
