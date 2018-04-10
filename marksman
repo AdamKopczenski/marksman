@@ -2,6 +2,8 @@
 require 'pp'
 require 'zlib'
 
+require_relative 'lib/census'
+
 UPPERCASE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 LOWERCASE_CHARACTERS = 'abcdefghijklmnopqrstuvwxyz'
 HIDDEN_CHARACTERS = UPPERCASE_CHARACTERS + LOWERCASE_CHARACTERS
@@ -63,17 +65,6 @@ def hidden_letters
   }.join
 end
 
-def census(letter_set)
-  return letter_set.chars.reduce(Hash::new(0)) do |h, c|
-    h[c] += 1
-    h
-  end
-end
-
-def census_subset?(c1, c2)
-  return c1.keys.all? { |l| c1[l] <= c2[l] }
-end
-
 def hidden_directory
   return (0...quote_length).reject do |i|
     $game_status[:found_chars][i]
@@ -85,13 +76,13 @@ end
 def reveal(request_census)
   dir = hidden_directory
   new_reveals = Array::new(quote_length, false)
-  request_census.each do |letter, count|
+  request_census.data.each do |letter, count|
     dir[letter].sample(count).each { |i| $game_status[:found_chars][i] = true }
   end
 end
 
 def valid_guess?(request_census)
-  return census_subset?(request_census, census(hidden_letters))
+  return request_census.subset?(Census.new(hidden_letters))
 end
 
 def victory?
@@ -99,7 +90,7 @@ def victory?
 end
 
 def process_guess(input)
-  in_census = census(input)
+  in_census = Census.new(input)
   if valid_guess?(in_census) then
     if $options[:interactive] then
       puts "All letters from \"#{input}\" in answer!"
