@@ -33,7 +33,7 @@ Guess #6: e
 "‗'__ ____r __e_ _ ___________ ___ ‗ __st ____ ‗'_ __ _____n_ __ __." -- ‗______ ‗___e_
 Guess #7: e
 "‗'__ ____r _ee_ _ ___________ ___ ‗ __st ____ ‗'_ _e _____n_ __ __." -- ‗______ ‗___e_
-Guess #8: 
+Guess #8:
 ```
 
 This is going to take forever. Fortunately, we can speed it up by putting more than one letter in a single guess. Unfortunately, the entire guess will be rejected (and no progress will be made) if even a single extra copy of one letter is present in a guess.
@@ -48,13 +48,13 @@ All letters from "ieim" in answer!
 Guess #10: lioeixqj
 Not all letters from "lioeixqj" in answer.
 "I'__ _e__r _een a mi_l__nair_ __t I __st ____ ‗'_ _e _____n_ __ i_." -- ‗___t__ ‗___er
-Guess #11: lioei
-All letters from "lioei" in answer!
+Guess #11: LIOEI
+All letters from "LIOEI" in answer!
 "I'__ _e_er _een a milli_nair_ __t I __st ____ I'_ _e _____n_ __ i_." -- ‗__ot__ ‗___er
-Guess #12: 
+Guess #12:
 ```
 
-Notice a few things about our recent guesses. It turns out that the order of letters in our guesses don't matter: guessing "aeiou" is equivalent to guessing "ueiao" or any other permutation. Also, the game treats capital and lowercase letters the same for purposes of filling in guesses.
+Notice a few things about our recent guesses. It turns out that the order of letters in our guesses don't matter: guessing "aeiou" is equivalent to guessing "ueiao" or any other permutation. Also, guesses are case-insensitive.
 
 That's about it for the rules of the game. It'll continue until we reveal the entire quotation and simply count how many guesses we needed to make. That's all the game has for feedback or a scoring system, which means that the only penalty for a bad guess is a single "point," but I find this is already a pretty satisfying gameplay experience.
 
@@ -83,10 +83,10 @@ All letters from "venvbu" in answer!
 Guess #16: nb
 All letters from "nb" in answer!
 "I've never been a millionaire _ut I __st _n__ I'_ be _____n_ __ i_." -- ‗o_ot__ ‗___er
-Guess #17: nb
+Guess #17: b
 All letters from "b" in answer!
 "I've never been a millionaire but I __st _n__ I'_ be _____n_ __ i_." -- ‗o_ot__ ‗___er
-Guess #18: 
+Guess #18:
 ```
 
 We can't be 100% certain that we've found every *b*, *e*, *n*, *o*, *u*, and *v* in the puzzle just because the section we've been harping on is complete, but it's a nice start. And we finished the words *been* and *be* thanks to our repetition!
@@ -112,10 +112,10 @@ The extra *d* is a big help: the speaker's first name is Dorothy! (Also, the sen
 
 ```
 Guess #20: arhy
-All letters from "rhy" in answer!
+All letters from "arhy" in answer!
 "I've never been a millionaire but I _ust _n__ I'd be _a___n_ _t it." -- Do_othy ‗_r_er
 Guess #21: ar
-All letters from "r" in answer!
+All letters from "ar" in answer!
 "I've never been a millionaire but I _ust _n__ I'd be _ar__n_ at it." -- Do_othy ‗_r_er
 Guess #21: r
 All letters from "r" in answer!
@@ -131,7 +131,7 @@ Not all letters from "m" in answer.
 Guess #23:
 ```
 
-A wasted guess! But we've learned that the letter *m* is totally done with in the puzzle. We'll make a mental note to avoid using it at any point in the future, and we'll try *just* as the word in question. 
+A wasted guess! But we've learned that the letter *m* is totally done with in the puzzle. We'll make a mental note to avoid using it at any point in the future, and we'll try *just* as the word in question.
 
 ```
 Guess #23: j
@@ -155,7 +155,7 @@ So far in our example game, we've been picking a small segment of the quotation 
 Guess #25: kow
 All letters from "kow" in answer!
 "I've never been a millionaire but I just know I'd be _ar__n_ at it." -- Dorothy Parker
-Guess #26: 
+Guess #26:
 ```
 
 I'm out of tips to give in this space; I'm sure you'll have many other ideas as you play. For now, I'll finish our game in one shot.
@@ -165,7 +165,7 @@ Guess #26: dlig
 All letters from "dlig" in answer!
 "I've never been a millionaire but I just know I'd be darling at it." -- Dorothy Parker
 You won in 26 guesses!
-akopczenski@mampara:~$ 
+akopczenski@mampara:~$
 ```
 
 </p></details>
