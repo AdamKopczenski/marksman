@@ -1,32 +1,8 @@
 #! /usr/bin/ruby
-require 'pp'
-require 'zlib'
 
-require_relative 'lib/census'
+require_relative 'lib/game'
 
-UPPERCASE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-LOWERCASE_CHARACTERS = 'abcdefghijklmnopqrstuvwxyz'
-HIDDEN_CHARACTERS = UPPERCASE_CHARACTERS + LOWERCASE_CHARACTERS
-
-$game_status = {}
-$options = {:interactive => true}
-
-def quote_length
-  return $game_status[:answer].length
-end
-
-def select_quote
-  all_quotes = Zlib::Inflate.inflate(File.read('.data/quotes.dat')).split("\n")
-  return all_quotes.sample
-end
-
-def setup_game
-  $game_status[:answer] = select_quote
-  $game_status[:found_chars] = Array::new(quote_length, false)
-  (0...quote_length).each do |i|
-    $game_status[:found_chars][i] ||= !HIDDEN_CHARACTERS.include?($game_status[:answer][i])
-  end
-end
+# $options = {:interactive => true}
 
 def screen_width
   #TODO Consider a more robust solution for other platforms.
@@ -45,76 +21,24 @@ def wrap_string(s, cols)
   return result
 end
 
-def encode_letter(l)
-  return UPPERCASE_CHARACTERS.include?(l) ? '‗' : '_'
-end
-
-def current_board
-  result = (0...quote_length).map { |i|
-    $game_status[:found_chars][i] ? $game_status[:answer][i]
-                                  : encode_letter($game_status[:answer][i])
-  }.join
-  #TODO line breaks
-
-  return wrap_string(result, screen_width)
-end
-
-def hidden_letters
-  return (0...quote_length).map { |i|
-    $game_status[:found_chars][i] ? '' : $game_status[:answer][i].downcase
-  }.join
-end
-
-def hidden_directory
-  return (0...quote_length).reject do |i|
-    $game_status[:found_chars][i]
-  end.group_by do |i|
-    $game_status[:answer][i].downcase
-  end
-end
-
-def reveal(request_census)
-  dir = hidden_directory
-  new_reveals = Array::new(quote_length, false)
-  request_census.data.each do |letter, count|
-    dir[letter].sample(count).each { |i| $game_status[:found_chars][i] = true }
-  end
-end
-
-def valid_guess?(request_census)
-  return request_census.subset?(Census.new(hidden_letters))
-end
-
-def victory?
-  return $game_status[:found_chars].all?
-end
-
-def process_guess(input)
-  in_census = Census.new(input.gsub(/[^A-Za-z]/, '').downcase)
-  if valid_guess?(in_census) then
-    if $options[:interactive] then
-      puts "All letters from \"#{input}\" in answer!"
-    end
-    reveal(in_census)
-  else
-    if $options[:interactive] then
-      puts "Not all letters from \"#{input}\" in answer."
-    end
-  end
-  puts current_board
-end
-
-def play_interactive
-  puts current_board
+def play_interactive(game_object)
+  puts wrap_string(game_object.current_board, screen_width)
   guess_counter = 0
-  while !victory?
+  while !game_object.victory?
     guess_counter += 1
     print "Guess \##{guess_counter}: "
     current_guess = gets.chomp
-    process_guess(current_guess)
+    game_object.process_guess(current_guess)
+    if game_object.last_guess_successful then
+      puts "All letters from \"#{current_guess}\" in answer!"
+    else
+      puts "Not all letters from \"#{current_guess}\" in answer."
+    end
+    puts wrap_string(game_object.current_board, screen_width)
+
   end
   puts "You won in #{guess_counter} guesses!"
 end
 
-setup_game
-play_interactive
+the_game = Game::new
+play_interactive(the_game)
