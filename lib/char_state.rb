@@ -1,5 +1,4 @@
 #! /usr/bin/ruby
-require 'zlib'
 
 module Character_State
   UNREVEALED = 0
