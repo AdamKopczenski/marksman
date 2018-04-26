@@ -10,6 +10,7 @@ def screen_width
 end
 
 def wrap_string(s, cols)
+  
   result = ''
   remainder = s
   while remainder.length > cols do

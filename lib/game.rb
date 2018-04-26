@@ -1,5 +1,6 @@
 #! /usr/bin/ruby
 require 'zlib'
+require 'colorize'
 require 'pp'
 
 require_relative 'census'
@@ -26,6 +27,8 @@ class Game
       case @char_states[i]
       when Character_State::UNREVEALED
         Game::hidden_letter_symbol(@answer[i])
+      when Character_State::NEWLY_REVEALED
+        @answer[i].colorize(:color => :light_green)
       when Character_State::REVEALED
         @answer[i]
       end
@@ -37,6 +40,7 @@ class Game
   end
 
   def process_guess(input)
+    @char_states.map!{ |s| Character_State::AGED_VERSION[s] }
     in_census = Census.new(input.gsub(/[^A-Za-z]/, '').downcase)
     @last_guess_successful = valid_guess?(in_census)
     if @last_guess_successful then
@@ -74,7 +78,7 @@ class Game
     dir = hidden_directory
     request_census.data.each do |letter, count|
       dir[letter].sample(count).each do |i|
-        @char_states[i] = Character_State::REVEALED
+        @char_states[i] = Character_State::NEWLY_REVEALED
       end
     end
   end
