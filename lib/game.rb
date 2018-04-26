@@ -1,7 +1,9 @@
 #! /usr/bin/ruby
 require 'zlib'
+require 'pp'
 
 require_relative 'census'
+require_relative 'char_state'
 
 UPPERCASE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 LOWERCASE_CHARACTERS = 'abcdefghijklmnopqrstuvwxyz'
@@ -11,9 +13,9 @@ HIDDEN_CHARACTERS = UPPERCASE_CHARACTERS + LOWERCASE_CHARACTERS
 class Game
   def initialize
     @answer = Game::select_quote
-    @found_chars = Array::new(quote_length, false)
-    (0...quote_length).each do |i|
-      @found_chars[i] ||= !HIDDEN_CHARACTERS.include?(@answer[i])
+    @char_states = @answer.chars.map do |c|
+      HIDDEN_CHARACTERS.include?(c) ? Character_State::UNREVEALED
+                                    : Character_State::REVEALED
     end
   end
 
@@ -21,13 +23,17 @@ class Game
 
   def current_board
     return (0...quote_length).map { |i|
-      @found_chars[i] ? @answer[i]
-                      : Game::hidden_letter_symbol(@answer[i])
+      case @char_states[i]
+      when Character_State::UNREVEALED
+        Game::hidden_letter_symbol(@answer[i])
+      when Character_State::REVEALED
+        @answer[i]
+      end
     }.join
   end
 
   def victory?
-    return @found_chars.all?
+    return @char_states.none?{ |s| Character_State::IS_HIDDEN[s] }
   end
 
   def process_guess(input)
@@ -46,15 +52,15 @@ class Game
   # A string containing only the still-hidden characters from the quotation.
   def hidden_letters
     return (0...quote_length).map { |i|
-      @found_chars[i] ? '' : @answer[i].downcase
+      Character_State::IS_HIDDEN[@char_states[i]] ? @answer[i].downcase : ''
     }.join
   end
 
   # A hash containing each unguessed letter in the quote and each index where
   # it is located.
   def hidden_directory
-    return (0...quote_length).reject do |i|
-      @found_chars[i]
+    return (0...quote_length).select do |i|
+      Character_State::IS_HIDDEN[@char_states[i]]
     end.group_by do |i|
       @answer[i].downcase
     end
@@ -66,9 +72,10 @@ class Game
 
   def reveal(request_census)
     dir = hidden_directory
-    new_reveals = Array::new(quote_length, false)
     request_census.data.each do |letter, count|
-      dir[letter].sample(count).each { |i| @found_chars[i] = true }
+      dir[letter].sample(count).each do |i|
+        @char_states[i] = Character_State::REVEALED
+      end
     end
   end
 
