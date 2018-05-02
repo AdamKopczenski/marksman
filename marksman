@@ -12,10 +12,11 @@ end
 def wrap_string(s, cols)
   result = ''
   remainder = s
-  while remainder.length > cols do
-    index = remainder[0..cols].rindex(' ')
-    result += remainder[0...index] + "\n"
-    remainder = remainder[index + 1..-1]
+  while remainder.uncolorize.length > cols do
+    spaces_till_break = remainder.uncolorize[0..cols].count(' ')
+    split_string = remainder.split(' ')
+    result += split_string[0...spaces_till_break].join(' ') + "\n"
+    remainder = split_string[spaces_till_break..-1].join(' ')
   end
   result += remainder
   return result
