@@ -17,6 +17,7 @@
 
 ## Specific to RubyMotion:
 .dat*
+!.data/quotes.dat
 .repl_history
 build/
 *.bridgesupport
